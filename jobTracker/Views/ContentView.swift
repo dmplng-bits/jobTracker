@@ -11,6 +11,8 @@ struct ContentView: View {
     @State private var selectedJob: Job?
     @State private var showingAddSheet = false
     @State private var draggedJob: Job?
+    @State private var showingJobSearch = false
+    @State private var showingSettings = false
 
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -46,6 +48,12 @@ struct ContentView: View {
         .sheet(isPresented: $store.showingConflictResolution) {
             ConflictResolutionView(store: store)
         }
+        .sheet(isPresented: $showingJobSearch) {
+            JobSearchView(store: store)
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+        }
     }
     #endif
 
@@ -75,15 +83,26 @@ struct ContentView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Menu {
                         Button {
+                            showingJobSearch = true
+                        } label: {
+                            Label("Find Jobs", systemImage: "magnifyingglass")
+                        }
+                        Divider()
+                        Button {
                             exportJobsForIOS()
                         } label: {
                             Label("Export Jobs", systemImage: "square.and.arrow.up")
                         }
-                        Divider()
                         Button {
                             showingImportSheet = true
                         } label: {
                             Label("Import Jobs", systemImage: "square.and.arrow.down")
+                        }
+                        Divider()
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Label("Settings", systemImage: "gear")
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
@@ -106,6 +125,12 @@ struct ContentView: View {
             }
             .sheet(isPresented: $store.showingConflictResolution) {
                 ConflictResolutionView(store: store)
+            }
+            .sheet(isPresented: $showingJobSearch) {
+                JobSearchView(store: store)
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
             }
             .fileExporter(
                 isPresented: $showingExportSheet,
@@ -151,6 +176,11 @@ struct ContentView: View {
             }
 
             #if os(macOS)
+            Button(action: { showingJobSearch = true }) {
+                Label("Find Jobs", systemImage: "magnifyingglass")
+            }
+            .buttonStyle(.bordered)
+
             Menu {
                 Button("Export Jobs...") {
                     store.exportJobs()
@@ -167,6 +197,11 @@ struct ContentView: View {
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
+
+            Button(action: { showingSettings = true }) {
+                Image(systemName: "gear")
+            }
+            .buttonStyle(.plain)
 
             Button(action: { showingAddSheet = true }) {
                 Label("Add Job", systemImage: "plus")

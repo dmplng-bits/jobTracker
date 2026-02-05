@@ -106,6 +106,14 @@ class JobStore: ObservableObject {
         jobs.filter { $0.status == status }
     }
 
+    // MARK: - Job Search Integration
+
+    /// Converts a scraped job from the search API and adds it to the tracker
+    func addScrapedJob(_ scrapedJob: ScrapedJob) {
+        let job = scrapedJob.toTrackerJob()
+        addJob(job)
+    }
+
     // MARK: - Import/Export
 
     #if os(macOS)
