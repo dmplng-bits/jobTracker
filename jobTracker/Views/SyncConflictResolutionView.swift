@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-struct ConflictResolutionView: View {
+struct SyncConflictResolutionView: View {
     @ObservedObject var store: JobStore
     @Environment(\.dismiss) var dismiss
 

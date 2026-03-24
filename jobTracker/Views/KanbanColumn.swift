@@ -16,6 +16,15 @@ struct KanbanColumn: View {
     let onMove: (Job, JobStatus) -> Void
 
     @State private var isTargeted = false
+    @State private var searchText = ""
+
+    private var filteredJobs: [Job] {
+        guard !searchText.isEmpty else { return jobs }
+        return jobs.filter {
+            $0.company.localizedCaseInsensitiveContains(searchText) ||
+            $0.role.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -36,10 +45,36 @@ struct KanbanColumn: View {
             .background(status.color.opacity(0.15))
             .cornerRadius(10)
 
+            // Search bar — visible whenever the column has items
+            if !jobs.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                        .font(.footnote)
+                    TextField("Search...", text: $searchText)
+                        .textFieldStyle(.plain)
+                        .font(.subheadline)
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                                .font(.footnote)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+                .background(Color.secondary.opacity(0.1))
+                .cornerRadius(8)
+            }
+
             // Cards
             ScrollView {
                 LazyVStack(spacing: 10) {
-                    ForEach(jobs) { job in
+                    ForEach(filteredJobs) { job in
                         JobCard(job: job)
                             .onTapGesture { onSelect(job) }
                             #if os(macOS)
@@ -66,7 +101,7 @@ struct KanbanColumn: View {
                 .padding(.horizontal, 4)
             }
         }
-        .frame(minWidth: status == .wishlist ? 280 : 220, maxWidth: .infinity)
+        .frame(minWidth: status == .wishlist ? 280 : 220, maxWidth: .infinity, maxHeight: .infinity)
         .padding(10)
         .background(isTargeted ? status.color.opacity(0.1) : Color.clear)
         .cornerRadius(12)

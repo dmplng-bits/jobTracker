@@ -46,7 +46,7 @@ struct ContentView: View {
             JobFormView(store: store, job: job)
         }
         .sheet(isPresented: $store.showingConflictResolution) {
-            ConflictResolutionView(store: store)
+            SyncConflictResolutionView(store: store)
         }
         .sheet(isPresented: $showingJobSearch) {
             JobSearchView(store: store)
@@ -124,7 +124,7 @@ struct ContentView: View {
                 JobFormView(store: store, job: job)
             }
             .sheet(isPresented: $store.showingConflictResolution) {
-                ConflictResolutionView(store: store)
+                SyncConflictResolutionView(store: store)
             }
             .sheet(isPresented: $showingJobSearch) {
                 JobSearchView(store: store)
